@@ -4,7 +4,6 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func, distinct
 from datetime import datetime, timezone, timedelta
 from typing import Optional
-
 from app.database import get_db, EventORM
 from app.metrics  import get_converted_visitors, get_default_date, get_unique_visitors
 from app.models   import AnomalyResponse, Anomaly, AnomalySeverity
@@ -13,7 +12,6 @@ router = APIRouter()
 
 ALL_ZONES = ["MAKEUP", "SKIN", "BATH_AND_BODY", "HAIR",
              "PERSONAL_CARE", "FRAGRANCE", "BILLING"]
-
 
 @router.get("/stores/{store_id}/anomalies", response_model=AnomalyResponse)
 def get_anomalies(store_id: str, db: Session = Depends(get_db)):

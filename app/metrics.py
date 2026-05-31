@@ -1,4 +1,3 @@
-
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import func, distinct
@@ -10,14 +9,13 @@ from app.models   import MetricsResponse, ZoneDwell
 
 router = APIRouter()
 
-
 def get_default_date(db: Session, store_id: str) -> str:
-    """Use most recent event date — not today's date."""
+    "Use most recent event date — not today's date."
+
     latest = db.query(func.max(EventORM.timestamp))\
                .filter(EventORM.store_id == store_id)\
                .scalar()
     if latest:
-        # SQLite may return string or datetime
         ts = str(latest)[:10]
         return ts
     from datetime import date
@@ -25,6 +23,7 @@ def get_default_date(db: Session, store_id: str) -> str:
 
 def get_unique_visitors(db: Session, store_id: str, target_date: str) -> int:
     # Primary source: ENTRY events from entry camera
+
     entry_count = db.query(func.count(distinct(EventORM.visitor_id)))\
                     .filter(
                         EventORM.store_id   == store_id,
@@ -53,6 +52,7 @@ def get_converted_visitors(db: Session, store_id: str, target_date: str) -> set:
     Wider window handles short clips that don't perfectly
     align with transaction timestamps.
     """
+    
     transactions = db.query(POSTransactionORM)\
                      .filter(
                          POSTransactionORM.store_id == store_id,

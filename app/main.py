@@ -5,12 +5,10 @@ import logging
 import csv
 from datetime import datetime, timezone
 from pathlib import Path
-
 import structlog
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import OperationalError
-
 from app.database import create_tables, engine, SessionLocal, POSTransactionORM
 from app.ingestion import router as ingest_router
 from app.health    import router as health_router
@@ -21,7 +19,6 @@ from app.anomalies import router as anomalies_router
 from app.pos import router as pos_router
 
 # ─── Logging Setup ────────────────────────────────────────────────────────────
-
 logging.basicConfig(
     format="%(message)s",
     level=logging.INFO,
@@ -42,7 +39,6 @@ logger = structlog.get_logger()
 
 
 # ─── App ──────────────────────────────────────────────────────────────────────
-
 app = FastAPI(
     title="Store Intelligence API",
     description="Real-time retail analytics from CCTV event streams",
@@ -51,7 +47,6 @@ app = FastAPI(
 
 
 # ─── Routers ──────────────────────────────────────────────────────────────────
-
 app.include_router(ingest_router)
 app.include_router(health_router)
 app.include_router(metrics_router)
@@ -108,7 +103,7 @@ async def request_logging_middleware(request: Request, call_next):
 
 @app.exception_handler(OperationalError)
 async def db_error_handler(request: Request, exc: OperationalError):
-    # Database is down → 503 with structured body (never a raw traceback)
+    
     logger.error("database_unavailable", error=str(exc))
     return JSONResponse(
         status_code=503,
@@ -129,7 +124,6 @@ async def generic_error_handler(request: Request, exc: Exception):
 
 
 # ─── Startup ──────────────────────────────────────────────────────────────────
-
 @app.on_event("startup")
 def on_startup():
     # Create tables if they don't exist yet

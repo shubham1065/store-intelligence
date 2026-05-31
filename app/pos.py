@@ -3,11 +3,9 @@ from sqlalchemy.orm import Session
 from datetime import datetime, timezone
 from typing import List
 from pydantic import BaseModel
-
 from app.database import get_db, POSTransactionORM
 
 router = APIRouter()
-
 
 class POSTransaction(BaseModel):
     transaction_id:   str

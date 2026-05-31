@@ -1,4 +1,3 @@
-
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import func, distinct
@@ -9,7 +8,6 @@ from app.metrics  import get_default_date
 from app.models   import HeatmapResponse, HeatmapZone
 
 router = APIRouter()
-
 
 @router.get("/stores/{store_id}/heatmap", response_model=HeatmapResponse)
 def get_heatmap(
