@@ -1,0 +1,111 @@
+{
+    "store_id": "ST1008",
+    "store_name": "Brigade_Bangalore",
+    "city": "Bangalore",
+    "date": "2026-04-10",
+    "open_hours": {
+        "open": "11:00",
+        "close": "22:00"
+    },
+    "cameras": [
+        {
+            "camera_id": "CAM_01",
+            "type": "entry",
+            "clip_filename": "cam1.mp4",
+            "clip_start_time": "20:10:00", 
+            "entry_line_y_ratio": 0.55,
+            "entry_direction": "top_to_bottom",
+            "primary_zones": []
+        },
+        {
+            "camera_id": "CAM_02",
+            "type": "floor",
+            "clip_filename": "cam2.mp4",
+            "clip_start_time": "20:10:02",
+            "primary_zones": [
+                "MAKEUP",
+                "SKIN"
+            ]
+        },
+        {
+            "camera_id": "CAM_03",
+            "type": "floor",
+            "clip_filename": "cam3.mp4",
+            "clip_start_time": "20:10:27",
+            "primary_zones": [
+                "BATH_AND_BODY",
+                "HAIR"
+            ]
+        },
+        {
+            "camera_id": "CAM_04",
+            "type": "backroom",
+            "clip_filename": "cam4.mp4",
+            "clip_start_time": "20:09:45",
+            "primary_zones": ["BACKROOM"]
+        },
+        {
+            "camera_id": "CAM_05",
+            "type": "billing",
+            "clip_filename": "cam5.mp4",
+            "clip_start_time": "20:09:48",
+            "primary_zones": [
+                "BILLING"
+            ]
+        }
+    ],
+    "zones": [
+        {
+            "zone_id": "MAKEUP",
+            "sku_zone": "makeup",
+            "camera_id": "CAM_02"
+        },
+        {
+            "zone_id": "SKIN",
+            "sku_zone": "skin",
+            "camera_id": "CAM_02"
+        },
+        {
+            "zone_id": "BATH_AND_BODY",
+            "sku_zone": "bath-and-body",
+            "camera_id": "CAM_03"
+        },
+        {
+            "zone_id": "HAIR",
+            "sku_zone": "hair",
+            "camera_id": "CAM_03"
+        },
+        {
+            "zone_id": "BACKROOM",
+            "sku_zone": "backroom",
+            "camera_id": "CAM_04"
+        },
+        {
+            "zone_id": "BILLING",
+            "sku_zone": "billing",
+            "camera_id": "CAM_05"
+        }
+    ],
+    "staff": {
+        "employee_codes": [
+            "CL2063",
+            "CL2727",
+            "CL1997",
+            "CL2541",
+            "CL2680"
+        ],
+        "names": [
+            "kasthuri v",
+            "Zufishan Khazra",
+            "Shashikala .",
+            "Naziya Begum",
+            "Priya v"
+        ],
+        "count": 5,
+        "uniform_hsv": {
+            "lower": [0, 0, 0],
+            "upper": [180, 255, 60]
+        },
+        "long_presence_minutes": 8
+    }
+}
