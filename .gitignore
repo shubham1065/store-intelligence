@@ -1,8 +1,13 @@
 venv/
 __pycache__/
 *.pyc
-data/*.db
 .env
 .pytest_cache/
 htmlcov/
 .coverage
+data/clips/
+data/*.csv
+data/*.xlsx
+data/*.mp4
+data/*.jsonl
+data/*.db
