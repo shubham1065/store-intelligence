@@ -1,0 +1,6 @@
+ultralytics>=8.3.0
+opencv-python==4.9.0.80
+numpy==1.26.4
+requests==2.31.0
+pandas==2.2.1
+scipy==1.13.0
