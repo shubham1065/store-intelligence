@@ -1,4 +1,3 @@
-# app/main.py
 
 import time
 import uuid
@@ -19,7 +18,7 @@ from app.metrics   import router as metrics_router
 from app.funnel    import router as funnel_router
 from app.heatmap   import router as heatmap_router
 from app.anomalies import router as anomalies_router
-
+from app.pos import router as pos_router
 
 # ─── Logging Setup ────────────────────────────────────────────────────────────
 
@@ -59,7 +58,7 @@ app.include_router(metrics_router)
 app.include_router(funnel_router)
 app.include_router(heatmap_router)
 app.include_router(anomalies_router)
-
+app.include_router(pos_router)  
 
 # ─── Middleware ───────────────────────────────────────────────────────────────
 @app.get("/", tags=["Root"])

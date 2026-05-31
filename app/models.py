@@ -1,5 +1,3 @@
-# app/models.py
-
 from enum import Enum
 from typing import Optional, List, Dict, Any
 from pydantic import BaseModel, Field, field_validator
