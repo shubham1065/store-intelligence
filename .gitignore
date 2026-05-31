@@ -11,3 +11,6 @@ data/*.xlsx
 data/*.mp4
 data/*.jsonl
 data/*.db
+yolov8m.pt
+*.pt
+runs/
