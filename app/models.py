@@ -42,8 +42,6 @@ class StoreEvent(BaseModel):
     confidence: float          = Field(..., ge=0.0, le=1.0)
     metadata:   EventMetadata  = Field(default_factory=EventMetadata)
 
-    model_config = {"json_encoders": {datetime: lambda v: v.isoformat()}}
-
 class EventBatch(BaseModel):
     events: List[StoreEvent]
 
