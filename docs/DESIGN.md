@@ -13,13 +13,13 @@ The system was built for Brigade_Bangalore (store ID: ST1008), processing 5 came
 ```mermaid
 graph TD
     %% Input Layers
-    subgraph Input Sources
+    subgraph input_sources ["Input Sources"]
         Clips[5x CCTV Video Feeds <br> 1080p @ 30fps]
         POS[Raw POS Basket CSV <br> 37 Columns]
     end
 
     %% Pipeline Processing
-    subgraph Vision Layer (pipeline/)
+    subgraph vision_layer ["Vision Layer (pipeline/)"]
         Detect[detect.py <br> YOLOv8m Inference]
         Track[tracker.py <br> ByteTrack Engine]
         Staff[staff.py <br> HSV Uniform Matcher]
@@ -29,7 +29,7 @@ graph TD
     end
 
     %% Storage & API
-    subgraph Core Engine (app/)
+    subgraph core_engine ["Core Engine (app/)"]
         Events[(events.jsonl <br> Stream Buffer)]
         Ingest[ingestion.py <br> Idempotent Batch Ingest]
         FastAPI[FastAPI Router Engine <br> 6 Analytics Endpoints]
@@ -39,18 +39,18 @@ graph TD
         Zones -->|JSONL Batches| Events
         Events --> Ingest --> FastAPI
         POS --> POSLoader -->|Bulk Insert| SQLite
-        FastAPI <---> SQLite
+        FastAPI <--> SQLite
     end
 
     %% Visualization View
-    subgraph Presentation Layer
+    subgraph presentation_layer ["Presentation Layer"]
         Dash[dashboard/live.py <br> Rich Terminal UI]
         FastAPI --> Dash
     end
 
-    style Vision Layer fill:#f5f7ff,stroke:#4f46e5,stroke-width:2px
-    style Core Engine fill:#f0fdf4,stroke:#16a34a,stroke-width:2px
-    style Presentation Layer fill:#fff7ed,stroke:#ea580c,stroke-width:2px
+    style vision_layer fill:#f5f7ff,stroke:#4f46e5,stroke-width:2px
+    style core_engine fill:#f0fdf4,stroke:#16a34a,stroke-width:2px
+    style presentation_layer fill:#fff7ed,stroke:#ea580c,stroke-width:2px
 ```
 
 ## Stage 1 — Detection Pipeline
