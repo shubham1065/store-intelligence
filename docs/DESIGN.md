@@ -9,35 +9,19 @@ The system was built for Brigade_Bangalore (store ID: ST1008), processing 5 came
 ---
 
 ## System Architecture
-CCTV Clips (5 cameras)
-│
-▼
-┌─────────────────────┐
-│  Detection Pipeline │  YOLOv8m + ByteTrack per clip
-│  pipeline/detect.py │  Staff classification, Re-ID, zone assignment
-└─────────┬───────────┘
-│ structured events (JSONL)
-▼
-┌─────────────────────┐
-│   Event Ingestion   │  POST /events/ingest
-│   app/ingestion.py  │  Validates, deduplicates, stores (SQLite)
-└─────────┬───────────┘
-│
-▼
-┌─────────────────────┐
-│  Intelligence API   │  FastAPI — 6 endpoints
-│  app/metrics.py     │  Metrics, funnel, heatmap, anomalies, health
-│  app/funnel.py      │
-│  app/anomalies.py   │
-└─────────┬───────────┘
-│
-▼
-┌─────────────────────┐
-│   POS Correlation   │  pipeline/pos_loader.py
-│   app/pos.py        │  Maps billing zone visits to invoice timestamps
-└─────────────────────┘
 
----
+```mermaid
+graph TD
+    A[CCTV Clips <br> 5 cameras] -->|YOLOv8m + ByteTrack| B[Detection Pipeline <br> pipeline/detect.py]
+    
+    B -->|Structured Events JSONL| C[Event Ingestion <br> app/ingestion.py]
+    
+    C -->|Validates & Stores in SQLite| D[Intelligence API <br> FastAPI — 6 endpoints]
+    
+    D -->|Metrics, funnel, heatmap| E[POS Correlation <br> app/pos.py]
+    
+    E -.->|Maps billing zone to invoice| F(End of Flow)
+```
 
 ## Stage 1 — Detection Pipeline
 
