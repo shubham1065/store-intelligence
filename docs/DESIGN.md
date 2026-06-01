@@ -12,27 +12,57 @@ The system was built for Brigade_Bangalore (store ID: ST1008), processing 5 came
 
 ```mermaid
 graph TD
-    A[CCTV Clips <br> 5 cameras] -->|YOLOv8m + ByteTrack| B[Detection Pipeline <br> pipeline/detect.py]
-    
-    B -->|Structured Events JSONL| C[Event Ingestion <br> app/ingestion.py]
-    
-    C -->|Validates & Stores in SQLite| D[Intelligence API <br> FastAPI — 6 endpoints]
-    
-    D -->|Metrics, funnel, heatmap| E[POS Correlation <br> app/pos.py]
-    
-    E -.->|Maps billing zone to invoice| F(End of Flow)
+    %% Input Layers
+    subgraph Input Sources
+        Clips[5x CCTV Video Feeds <br> 1080p @ 30fps]
+        POS[Raw POS Basket CSV <br> 37 Columns]
+    end
+
+    %% Pipeline Processing
+    subgraph Vision Layer (pipeline/)
+        Detect[detect.py <br> YOLOv8m Inference]
+        Track[tracker.py <br> ByteTrack Engine]
+        Staff[staff.py <br> HSV Uniform Matcher]
+        Zones[zones.py <br> Spatial Geometry]
+        
+        Clips --> Detect --> Track --> Staff --> Zones
+    end
+
+    %% Storage & API
+    subgraph Core Engine (app/)
+        Events[(events.jsonl <br> Stream Buffer)]
+        Ingest[ingestion.py <br> Idempotent Batch Ingest]
+        FastAPI[FastAPI Router Engine <br> 6 Analytics Endpoints]
+        SQLite[(SQLite DB <br> 4 Composite Indexes)]
+        POSLoader[pos_loader.py <br> Invoice Aggregator]
+
+        Zones -->|JSONL Batches| Events
+        Events --> Ingest --> FastAPI
+        POS --> POSLoader -->|Bulk Insert| SQLite
+        FastAPI <---> SQLite
+    end
+
+    %% Visualization View
+    subgraph Presentation Layer
+        Dash[dashboard/live.py <br> Rich Terminal UI]
+        FastAPI --> Dash
+    end
+
+    style Vision Layer fill:#f5f7ff,stroke:#4f46e5,stroke-width:2px
+    style Core Engine fill:#f0fdf4,stroke:#16a34a,stroke-width:2px
+    style Presentation Layer fill:#fff7ed,stroke:#ea580c,stroke-width:2px
 ```
 
 ## Stage 1 — Detection Pipeline
 
 Each of the 5 camera clips is processed sequentially by `pipeline/detect.py`.
 
-**Camera roles** (discovered by inspecting footage, not assumed):
-- CAM_01: Entry/exit threshold — direction detection via virtual tripwire
-- CAM_02: Floor — MAKEUP and SKIN zones
-- CAM_03: Floor — BATH_AND_BODY and HAIR zones
-- CAM_04: Back room / inventory — **skipped entirely** (found by visual inspection)
-- CAM_05: Billing counter — queue depth and abandonment tracking
+### Camera Topography & Retail Annotations
+* **CAM_01 (Footfall Boundary):** Entry/Exit threshold monitoring. Executes a bidirectional virtual tripwire crossing algorithm to capture primary footfall baselines.
+* **CAM_02 (Cosmetics Experience Zone):** Mid-floor view mapping the **MAKEUP** and **SKIN** interaction zones. Measures micro-dwell times.
+* **CAM_03 (Personal Care Experience Zone):** Mid-floor view mapping the **BATH_AND_BODY** and **HAIR** interaction zones. Measures category affinity metrics.
+* **CAM_04 (Back-of-House Assets):** Stock/inventory backroom feed. Automatically skipped during frame processing on configuration discovery to save compute resources.
+* **CAM_05 (Point of Sale Queue):** Focused queue-line tracking over the billing counter to calculate lane congestion spikes and abandonment rates.
 
 **Key pipeline decisions:**
 - Process every other frame (15fps effective from 30fps source) for speed

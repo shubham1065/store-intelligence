@@ -137,9 +137,9 @@ graph LR
     API --> DB[(SQLite store.db)]
     API --> Dash[Live Rich Dashboard]
 
-    style Vision fill:#f9f,stroke:#333,stroke-width:2px
-    style API fill:#bbf,stroke:#333,stroke-width:2px
-    style DB fill:#bfb,stroke:#333,stroke-width:2px
+    style Vision fill:#4d0101,stroke:#333,stroke-width:2px
+    style API fill:#00005e,stroke:#333,stroke-width:2px
+    style DB fill:#005400,stroke:#333,stroke-width:2px
 ```
 
 The vision architecture executes through five core logical stages:
@@ -149,8 +149,8 @@ The vision architecture executes through five core logical stages:
 4. Event Emission — State machine tracking engine emitting structural ENTRY, EXIT, ZONE, DWELL, BILLING, and REENTRY events.
 5. Re-ID — Color histogram cosine similarity validation paired with a rolling 30-minute re-entry window block.
 
--> Detailed design trade-offs can be found in docs/CHOICES.md.
--> Deep system architecture layouts can be found in docs/DESIGN.md.
+* 📖 **Engineering Rationale:** Detailed design trade-offs, performance benchmarks, and AI override justifications are documented in [`docs/CHOICES.md`](docs/CHOICES.md).
+* 🏗️ **Architectural Deep-Dive:** Comprehensive system engineering layouts, database schemas, and camera topography logic are detailed in [`docs/DESIGN.md`](docs/DESIGN.md).
 
 ---
 
@@ -184,7 +184,7 @@ store-intelligence/
 │   ├── __init__.py          # Package initializer
 │   ├── live.py              # Terminal dashboard (Rich-based)
 │   └── replay.py            # Event replay at simulated speed
-├── data/                  # Local data storage(Directory excluded from Git)
+├── data/                    # Local data storage(Directory excluded from Git)
 │   ├── clips/               # Raw video footage for the vision pipeline
 │   │   └── *.mp4            # Store camera feeds (5 target camera streams)
 │   ├── Brigade_Bangalore_10_April_26.csv   # Local Point-of-Sale ingestion data
