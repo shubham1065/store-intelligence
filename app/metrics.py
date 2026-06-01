@@ -23,7 +23,6 @@ def get_default_date(db: Session, store_id: str) -> str:
 
 def get_unique_visitors(db: Session, store_id: str, target_date: str) -> int:
     # Primary source: ENTRY events from entry camera
-
     entry_count = db.query(func.count(distinct(EventORM.visitor_id)))\
                     .filter(
                         EventORM.store_id   == store_id,
@@ -32,18 +31,19 @@ def get_unique_visitors(db: Session, store_id: str, target_date: str) -> int:
                         func.date(EventORM.timestamp) == target_date
                     ).scalar() or 0
 
-    if entry_count > 0:
-        return entry_count
-
     # Fallback: count from floor zone events when entry camera
-    # over-detects staff (common with broad HSV range)
-    return db.query(func.count(distinct(EventORM.visitor_id)))\
-             .filter(
-                 EventORM.store_id   == store_id,
-                 EventORM.event_type.in_(["ZONE_ENTER", "ZONE_DWELL"]),
-                 EventORM.is_staff   == False,
-                 func.date(EventORM.timestamp) == target_date
-             ).scalar() or 0
+    # over-detects staff (common with broad HSV range).
+    # Return the max of both counts — if entry camera missed visitors
+    # (yields a very low count like 1), floor cameras give a truer count.
+    fallback_count = db.query(func.count(distinct(EventORM.visitor_id)))\
+                       .filter(
+                           EventORM.store_id   == store_id,
+                           EventORM.event_type.in_(["ZONE_ENTER", "ZONE_DWELL"]),
+                           EventORM.is_staff   == False,
+                           func.date(EventORM.timestamp) == target_date
+                       ).scalar() or 0
+
+    return max(entry_count, fallback_count)
 
 def get_converted_visitors(db: Session, store_id: str, target_date: str) -> set:
     """
