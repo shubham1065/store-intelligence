@@ -47,7 +47,7 @@ def get_funnel(store_id: str, date: Optional[str] = None, db: Session = Depends(
         stages   = [
             FunnelStage(stage="entry",         count=total,            drop_off_pct=0.0),
             FunnelStage(stage="zone_visit",    count=zone_visitors,    drop_off_pct=drop(zone_visitors, total)),
-            FunnelStage(stage="billing_queue", count=billing_visitors, drop_off_pct=drop(billing_visitors, billing_visitors)),
+            FunnelStage(stage="billing_queue", count=billing_visitors, drop_off_pct=drop(billing_visitors, zone_visitors)),
             FunnelStage(stage="purchase",      count=converted,        drop_off_pct=drop(converted, billing_visitors)),
         ]
     )
