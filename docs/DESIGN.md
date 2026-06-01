@@ -9,34 +9,33 @@ The system was built for Brigade_Bangalore (store ID: ST1008), processing 5 came
 ---
 
 ## System Architecture
-
-                    CCTV Clips (5 cameras)
-                             │
-                             ▼
-|----------------------------------------------------------------------|
-│  Detection Pipeline │  YOLOv8m + ByteTrack per clip                  |
-│  pipeline/detect.py │  Staff classification, Re-ID, zone assignment  |
-|----------------------------------------------------------------------|
-                             │ structured events (JSONL)
-                             ▼
-|----------------------------------------------------------------------|
-│   Event Ingestion   │  POST /events/ingest                           |
-│   app/ingestion.py  │  Validates, deduplicates, stores (SQLite)      |
-|----------------------------------------------------------------------|
-                             │
-                             ▼
-|----------------------------------------------------------------------|
-│  Intelligence API   │  FastAPI — 6 endpoints                         |
-│  app/metrics.py     │  Metrics, funnel, heatmap, anomalies, health   |
-│  app/funnel.py      │                                                |
-│  app/anomalies.py   │                                                |
-|----------------------------------------------------------------------|
-                             │
-                             ▼
-|----------------------------------------------------------------------|
-│   POS Correlation   │  pipeline/pos_loader.py                        |
-│   app/pos.py        │  Maps billing zone visits to invoice timestamps|
-|----------------------------------------------------------------------|
+CCTV Clips (5 cameras)
+│
+▼
+┌─────────────────────┐
+│  Detection Pipeline │  YOLOv8m + ByteTrack per clip
+│  pipeline/detect.py │  Staff classification, Re-ID, zone assignment
+└─────────┬───────────┘
+│ structured events (JSONL)
+▼
+┌─────────────────────┐
+│   Event Ingestion   │  POST /events/ingest
+│   app/ingestion.py  │  Validates, deduplicates, stores (SQLite)
+└─────────┬───────────┘
+│
+▼
+┌─────────────────────┐
+│  Intelligence API   │  FastAPI — 6 endpoints
+│  app/metrics.py     │  Metrics, funnel, heatmap, anomalies, health
+│  app/funnel.py      │
+│  app/anomalies.py   │
+└─────────┬───────────┘
+│
+▼
+┌─────────────────────┐
+│   POS Correlation   │  pipeline/pos_loader.py
+│   app/pos.py        │  Maps billing zone visits to invoice timestamps
+└─────────────────────┘
 
 ---
 
