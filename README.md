@@ -34,17 +34,17 @@ pip install -r pipeline/requirements.txt
 ```
 
 ### Place your clips
-Set up your local data folder using the following convention:
+Set up your local data folder and assign your video streams according to the camera layout below:
 
-data/
-└── clips/
-├── cam1.mp4    ← entry/exit camera
-├── cam2.mp4    ← makeup + skin zone
-├── cam3.mp4    ← bath & body + hair zone
-├── cam4.mp4    ← back room (auto-skipped)
-└── cam5.mp4    ← billing counter
+| Video Feed File | Targeted Store Zone | Pipeline Behavior / Logic |
+| :--- | :--- | :--- |
+| `data/clips/cam1.mp4` | 🚪 Entry / Exit | Triggers `ENTRY`/`EXIT` events & initializes Re-ID |
+| `data/clips/cam2.mp4` | 💄 Makeup + Skin | Tracks customer dwell-time and category interaction |
+| `data/clips/cam3.mp4` | 🧼 Bath & Body + Hair | Tracks customer dwell-time and category interaction |
+| `data/clips/cam4.mp4` | 📦 Back Room | **Auto-skipped** by the detection pipeline configuration |
+| `data/clips/cam5.mp4` | 💳 Billing Counter | Tracks queue spikes and maps to POS checkout |
 
-💡 Configuration Note: Update clip_start_time in pipeline/config/store_layout.json to match the exact timestamp watermark visible in each video clip.
+> 💡 **Configuration Note:** Update `clip_start_time` in `pipeline/config/store_layout.json` to match the exact timestamp watermark visible in each video clip.
 
 ### Run detection
 
@@ -122,9 +122,25 @@ curl http://localhost:8000/stores/ST1008/anomalies
 
 ## Architecture
 
-CCTV Clips ──> YOLOv8m + ByteTrack ──> Events (JSONL) ──> FastAPI ──> SQLite
-                                                            ^
-POS CSV ────────────────────────────────────────────────────┘
+```mermaid
+graph LR
+    %% Data Sources
+    Clips[CCTV Video Clips] --> Vision[YOLOv8m + ByteTrack Engine]
+    POS[POS Transaction CSV] --> Ingest[POS Loader Module]
+
+    %% Pipeline Processing
+    Vision -->|Structured Events| JSONL[(events.jsonl)]
+    JSONL --> API[FastAPI Backend Engine]
+    Ingest --> API
+
+    %% Storage & Access
+    API --> DB[(SQLite store.db)]
+    API --> Dash[Live Rich Dashboard]
+
+    style Vision fill:#f9f,stroke:#333,stroke-width:2px
+    style API fill:#bbf,stroke:#333,stroke-width:2px
+    style DB fill:#bfb,stroke:#333,stroke-width:2px
+```
 
 The vision architecture executes through five core logical stages:
 1. Person Detection — YOLOv8m base tracking (class=person, conf ≥ 0.35).
@@ -150,54 +166,56 @@ Coverage: 81% | Tests: 25 passing
 
 ## Project Structure
 
+```text
 store-intelligence/
-├── app/                        # FastAPI backend application
-│   ├── __init__.py             # Package initializer
-│   ├── anomalies.py            # /anomalies endpoint
-│   ├── database.py             # Database session and connection setup
-│   ├── funnel.py               # /funnel endpoint
-│   ├── health.py               # /health endpoint
-│   ├── heatmap.py              # /heatmap endpoint
-│   ├── ingestion.py            # /events/ingest endpoint
-│   ├── main.py                 # App entrypoint + middleware
-│   ├── metrics.py              # /metrics endpoint
-│   ├── models.py               # Database/Data validation models
-│   └── pos.py                  # /pos/load endpoint
-├── dashboard/                  # Live analytics dashboards
-│   ├── __init__.py             # Package initializer
-│   ├── live.py                 # Terminal dashboard (Rich-based)
-│   └── replay.py               # Event replay at simulated speed
-├── data/                       # Local data storage (Directory excluded from Git)
-│   ├── clips/                  # Raw video footage for the vision pipeline
-│   │   └── *.mp4               # Store camera feeds (5 target camera streams)
+├── app/                     # FastAPI backend application
+│   ├── __init__.py          # Package initializer
+│   ├── anomalies.py         # /anomalies endpoint
+│   ├── database.py          # Database session and connection setup
+│   ├── funnel.py            # /funnel endpoint
+│   ├── health.py            # /health endpoint
+│   ├── heatmap.py           # /heatmap endpoint
+│   ├── ingestion.py         # /events/ingest endpoint
+│   ├── main.py              # App entrypoint + middleware
+│   ├── metrics.py           # /metrics endpoint
+│   ├── models.py            # Database/Data validation models
+│   └── pos.py               # /pos/load endpoint
+├── dashboard/               # Live analytics dashboards
+│   ├── __init__.py          # Package initializer
+│   ├── live.py              # Terminal dashboard (Rich-based)
+│   └── replay.py            # Event replay at simulated speed
+├── data/                  # Local data storage(Directory excluded from Git)
+│   ├── clips/               # Raw video footage for the vision pipeline
+│   │   └── *.mp4            # Store camera feeds (5 target camera streams)
 │   ├── Brigade_Bangalore_10_April_26.csv   # Local Point-of-Sale ingestion data
-│   ├── events.jsonl            # Buffered downstream event logs
-│   └── store.db                # Target engine SQLite file (metrics & tracking state)
-├── docs/                       # Project documentation
-│   ├── CHOICES.md              # Architecture and design trade-offs
-│   └── DESIGN.md               # System design details
-├── pipeline/                   # Computer Vision & Detection pipeline
+│   ├── events.jsonl         # Buffered downstream event logs
+│   └── store.db             # Target engine SQLite file (metrics & tracking state)
+├── docs/                    # Project documentation
+│   ├── CHOICES.md           # Architecture and design trade-offs
+│   └── DESIGN.md            # System design details
+├── pipeline/                # Computer Vision & Detection pipeline
 │   ├── config/
-│   │   └── store_layout.json   # Spatial configuration for zone tracking
-│   ├── detect.py               # Main frame processing and YOLO inference
-│   ├── emit.py                 # Event schema builder
-│   ├── pos_loader.py           # POS CSV data ingestion
-│   ├── staff.py                # Staff vs. customer classification logic
-│   ├── tracker.py              # Object tracking and Re-ID management
-│   └── zones.py                # Zone allocation and entry-line crossings
-├── tests/                      # Test suite (81% test coverage)
-│   ├── __init__.py             # Package initializer for test module
-│   ├── conftest.py             # Pytest fixtures and environment setup
-│   ├── test_anomalies.py       # Tests for anomaly detection logic
-│   ├── test_ingestion.py       # Tests for data ingestion pipeline
-│   ├── test_metrics.py         # Tests for analytical metrics
-│   └── test_pipeline.py        # Tests for core vision tracking pipeline
-├── .dockerignore               # Files excluded from Docker builds
-├── .gitignore                  # Files excluded from Git tracking
-├── docker-compose.yml          # Multi-container orchestration config
-├── Dockerfile                  # Application containerization recipe
-├── requirements.txt            # Python dependencies (includes FastAPI, Uvicorn, Rich)
-└── yolov8m.pt                  # Pre-trained YOLOv8 object detection weights
+│   │   └── store_layout.json  # Spatial configuration for zone tracking
+│   ├── detect.py            # Main frame processing and YOLO inference
+│   ├── emit.py            # Event schema builder
+│   ├── pos_loader.py        # POS CSV data ingestion
+│   ├── staff.py             # Staff vs. customer classification logic
+│   ├── tracker.py           # Object tracking and Re-ID management
+│   └── zones.py             # Zone allocation and entry-line crossings
+├── tests/                   # Test suite
+│   ├── __init__.py          # Package initializer for test module
+│   ├── conftest.py          # Pytest fixtures and environment setup
+│   ├── test_anomalies.py    # Tests for anomaly detection logic
+│   ├── test_ingestion.py    # Tests for data ingestion pipeline
+│   ├── test_metrics.py      # Tests for analytical metrics
+│   └── test_pipeline.py     # Tests for core vision tracking pipeline
+├── .dockerignore            # Files excluded from Docker builds
+├── .gitignore               # Files excluded from Git tracking
+├── docker-compose.yml       # Multi-container orchestration config
+├── Dockerfile               # Application containerization recipe
+├── requirements.txt         # Python dependencies (includes FastAPI,    Uvicorn, Rich)
+└── yolov8m.pt               # Pre-trained YOLOv8m object detection weights
+```
 
 The data/ directory tracks local state and source assets. Because it contains heavy binary files and databases, its contents are omitted from Git tracking. To run the project locally:
 1. Ensure the data/ and data/clips/ directories exist at the root.
