@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   api:
     build: .
@@ -12,8 +10,8 @@ services:
       DATABASE_URL: "sqlite:////data/store.db"
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
       interval: 20s
-      timeout:  5s
-      retries:  3
+      timeout: 5s
+      retries: 3
       start_period: 10s
