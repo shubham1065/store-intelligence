@@ -45,7 +45,9 @@ graph TD
     %% Visualization View
     subgraph presentation_layer ["Presentation Layer"]
         Dash[dashboard/live.py <br> Rich Terminal UI]
+        WebDash[dashboard/index.html <br> Web Dashboard]
         FastAPI --> Dash
+        FastAPI -->|HTTP /dashboard| WebDash
     end
 
     style vision_layer fill:#f5f7ff,stroke:#4f46e5,stroke-width:2px

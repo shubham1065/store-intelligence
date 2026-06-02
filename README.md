@@ -1,4 +1,10 @@
 # Store Intelligence API
+
+
+<p align="left">
+  <img src="docs/banner.svg" alt="Purplle Intelligence System" width="800" />
+</p>
+
 **Purplle Tech Challenge 2026 — Offline Store Analytics Pipeline**
 
 Converts raw CCTV footage into real-time retail business metrics.
@@ -76,23 +82,34 @@ python pipeline/pos_loader.py data/Brigade_Bangalore_10_April_26.csv
 
 ## Live Dashboard
 
-Start the dashboard in a second terminal while the API is running:
+We provide both a terminal-based UI and a premium browser-based dashboard.
+
+### 🌐 Option 1: Web Dashboard (Recommended)
+FastAPI serves a responsive, modern web dashboard directly at:
+👉 **[http://localhost:8000/dashboard](http://localhost:8000/dashboard)**
+
+It features:
+- **Purplle Brand Theming**: A beautiful, eye-friendly sweet lavender theme tailored with soft borders and colors to match Purplle's visual identity.
+- **Live Auto-Refresh**: Pulls the 5 backend API endpoints (metrics, funnel, heatmap, anomalies, health) every 3 seconds with animated transitions.
+- **Store Floor Map**: A color-coded zones grid visualizer showing visit counts and average dwell times.
+- **Zero Dependencies**: Pure HTML/CSS/Vanilla JS — no heavy bundlers or build steps. You can also run it by simply double-clicking `dashboard/index.html`!
+
+### 💻 Option 2: Rich Terminal Dashboard
+Start the terminal dashboard while the API is running:
 
 ```bash
 pip install rich
 python dashboard/live.py
 ```
 
-To replay previously processed events in simulated real-time:
+To replay previously processed events in simulated real-time and watch the live updates:
 ```bash
-# Terminal 1 — dashboard
-python dashboard/live.py
-
-# Terminal 2 — replay events
+# Terminal 1 — Replay events to the API
 python dashboard/replay.py --input data/events.jsonl --speed 20
-```
 
-Dashboard URL (web version): `http://localhost:8000/docs`
+# Terminal 2 — Run the terminal dashboard (or keep the Web dashboard open!)
+python dashboard/live.py
+```
 
 ---
 
@@ -182,6 +199,7 @@ store-intelligence/
 │   └── pos.py               # /pos/load endpoint
 ├── dashboard/               # Live analytics dashboards
 │   ├── __init__.py          # Package initializer
+│   ├── index.html           # Web dashboard (lavender theme with Purplle branding)
 │   ├── live.py              # Terminal dashboard (Rich-based)
 │   └── replay.py            # Event replay at simulated speed
 ├── data/                    # Local data storage(Directory excluded from Git)

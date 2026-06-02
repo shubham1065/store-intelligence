@@ -7,7 +7,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 import structlog
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse, FileResponse
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.exc import OperationalError
 from app.database import create_tables, engine, SessionLocal, POSTransactionORM
 from app.ingestion import router as ingest_router
@@ -43,6 +44,14 @@ app = FastAPI(
     version="1.0.0",
 )
 
+# CORS — allow dashboard to call API from any origin (file://, localhost, etc.)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(ingest_router)
 app.include_router(health_router)
 app.include_router(metrics_router)
@@ -56,8 +65,17 @@ async def root():
     return {
         "message": "Store Intelligence API is online",
         "docs": "Navigate to /docs for interactive API documentation",
+        "dashboard": "Navigate to /dashboard for the live analytics dashboard",
         "status": "operational"
     }
+
+@app.get("/dashboard", tags=["Dashboard"], response_class=HTMLResponse)
+async def dashboard():
+    """Serve the live analytics dashboard."""
+    dashboard_path = Path(__file__).parent.parent / "dashboard" / "index.html"
+    if dashboard_path.exists():
+        return HTMLResponse(content=dashboard_path.read_text(encoding="utf-8"))
+    return HTMLResponse(content="<h1>Dashboard not found</h1><p>Place index.html in dashboard/</p>", status_code=404)
     
 @app.middleware("http")
 async def request_logging_middleware(request: Request, call_next):
