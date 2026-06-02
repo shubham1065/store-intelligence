@@ -44,7 +44,7 @@ def process_clip(
         long_presence_frames = int(staff_cfg.get("long_presence_minutes", 8) * 60 * 15)
     )
 
-    # Backroom camera — skip entirely...
+    # Backroom camera — skipping entirely...
     if cam_type == "backroom":
         print(f"  ℹ {camera_id} is backroom — skipping")
         return
@@ -78,7 +78,6 @@ def process_clip(
 
     frame_idx = 0
 
-    # Using YOLO-Track
     results = model.track(
         source    = clip_path,
         persist   = True,
@@ -96,14 +95,12 @@ def process_clip(
         timestamp = frame_to_timestamp(clip_start, frame_idx, fps)
         frame_idx += 1
 
-        # Skip every other frame for speed (still 7.5fps effective)
         if frame_idx % 2 != 0:
             continue
 
         current_track_ids: set = set()
 
         if result.boxes is None or result.boxes.id is None:
-            # No detections this frame
             _handle_disappeared_tracks(
                 prev_track_ids, set(), session_mgr, reid_mgr,
                 writer, store_id, camera_id, cam_type,
@@ -115,22 +112,18 @@ def process_clip(
         for box in result.boxes:
             track_id   = int(box.id.item())
             confidence = float(box.conf.item())
-            bbox       = box.xyxy[0].tolist()   # [x1, y1, x2, y2]
+            bbox       = box.xyxy[0].tolist()
 
             current_track_ids.add(track_id)
             staff_det.update_track(track_id)
 
-            # ── Staff classification ────────────────────────────────────────
             is_staff, staff_conf = staff_det.classify(frame, bbox, track_id)
             detection_conf = confidence * (staff_conf if is_staff else 1.0)
 
-            # ── Determine zone ──────────────────────────────────────────────
             current_zone = zone_clf.get_zone(bbox, fh)
             sku_zone     = zone_clf.get_sku_zone(current_zone)
 
-            # ── New track (not seen in previous frame) ──────────────────────
             if track_id not in prev_track_ids:
-                # Re-ID check
                 reentry_vid = None
                 if cam_type == "entry":
                     reentry_vid = reid_mgr.find_reentry(frame, bbox, timestamp)
@@ -155,7 +148,6 @@ def process_clip(
                         ))
 
                 elif current_zone and cam_type in ("floor", "billing"):
-                    # First appearance on floor/billing camera
                     session.current_zone   = current_zone
                     session.zone_entry_time = timestamp
 
@@ -163,7 +155,6 @@ def process_clip(
                     event_type  = "ZONE_ENTER"
 
                     if cam_type == "billing":
-                        # Count non-staff people currently in billing area
                         queue_depth = session_mgr.active_count(exclude_staff=True)
                         if queue_depth > 1:
                             event_type = "BILLING_QUEUE_JOIN"
@@ -183,7 +174,6 @@ def process_clip(
                     ))
 
             else:
-                # check dwell events
                 session = session_mgr.get(track_id)
                 if not session:
                     continue
@@ -216,7 +206,6 @@ def process_clip(
                         timestamp, writer, store_id, camera_id, detection_conf
                     )
 
-        # ── Tracks that disappeared this frame ──────────────────────────────
         disappeared = prev_track_ids - current_track_ids
         _handle_disappeared_tracks(
             disappeared, current_track_ids, session_mgr, reid_mgr,
@@ -231,9 +220,8 @@ def process_clip(
 
 def _handle_dwell(session, current_zone, sku_zone, timestamp,
                   writer, store_id, camera_id, confidence):
-    """Emit ZONE_DWELL every 30 seconds of continuous presence."""
+                  
     if session.current_zone != current_zone:
-        # Zone changed
         if session.current_zone and session.zone_entry_time:
             dwell_ms = int((timestamp - session.zone_entry_time).total_seconds() * 1000)
             writer.write(build_event(
@@ -266,7 +254,6 @@ def _handle_dwell(session, current_zone, sku_zone, timestamp,
         ))
 
     elif session.zone_entry_time:
-        # Same zone — check 30s dwell interval
         last = session.last_dwell_emit or session.zone_entry_time
         if (timestamp - last).total_seconds() >= 30:
             dwell_ms = int((timestamp - session.zone_entry_time).total_seconds() * 1000)

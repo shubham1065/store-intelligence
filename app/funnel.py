@@ -12,10 +12,8 @@ router = APIRouter()
 def get_funnel(store_id: str, date: Optional[str] = None, db: Session = Depends(get_db)):
     target_date = date or get_default_date(db, store_id)
 
-    # Stage 1 — reuse same logic as /metrics (includes fallback)
     total = get_unique_visitors(db, store_id, target_date)
 
-    # Stage 2 — visited at least one zone
     zone_visitors = db.query(func.count(distinct(EventORM.visitor_id)))\
                       .filter(
                           EventORM.store_id   == store_id,
@@ -24,7 +22,6 @@ def get_funnel(store_id: str, date: Optional[str] = None, db: Session = Depends(
                           func.date(EventORM.timestamp) == target_date
                       ).scalar() or 0
 
-    # Stage 3 — reached billing
     billing_visitors = db.query(func.count(distinct(EventORM.visitor_id)))\
                          .filter(
                              EventORM.store_id  == store_id,
@@ -33,7 +30,6 @@ def get_funnel(store_id: str, date: Optional[str] = None, db: Session = Depends(
                              func.date(EventORM.timestamp) == target_date
                          ).scalar() or 0
 
-    # Stage 4 — purchased
     converted = len(get_converted_visitors(db, store_id, target_date))
 
     def drop(current, previous):

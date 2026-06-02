@@ -30,7 +30,6 @@ def get_anomalies(store_id: str, db: Session = Depends(get_db)):
     thirty_ago = now - timedelta(minutes=30)
     target_date = get_default_date(db, store_id)
 
-    # ── 1. Billing queue spike ─────────────────────────────────────────────
     recent_max = db.query(func.max(EventORM.queue_depth))\
                    .filter(
                        EventORM.store_id   == store_id,
@@ -49,12 +48,11 @@ def get_anomalies(store_id: str, db: Session = Depends(get_db)):
             detected_at      = now.isoformat()
         ))
 
-    # ── 2. Conversion rate drop vs 20% retail benchmark ───────────────────
     total     = get_unique_visitors(db, store_id, target_date)
     converted = len(get_converted_visitors(db, store_id, target_date))
     rate      = converted / total if total > 0 else 0.0
 
-    if total >= 5 and rate < 0.12:   # below 12% = flag
+    if total >= 5 and rate < 0.12:  
         anomalies.append(Anomaly(
             anomaly_type     = "CONVERSION_DROP",
             severity         = AnomalySeverity.WARN,
@@ -64,7 +62,6 @@ def get_anomalies(store_id: str, db: Session = Depends(get_db)):
             detected_at      = now.isoformat()
         ))
 
-    # ── 3. Dead zone — no visits in last 30 min ───────────────────────────
     thirty_ago   = now - timedelta(minutes=30)
     active_zones = {
         z[0] for z in

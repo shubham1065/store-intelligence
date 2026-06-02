@@ -8,11 +8,9 @@ from app.models   import EventBatch, IngestResponse, StoreEvent
 
 router = APIRouter()
 
-
 def _event_to_orm(event: StoreEvent) -> EventORM:
     """Convert a validated Pydantic StoreEvent into an ORM row."""
     ts = event.timestamp
-    # Normalise to UTC-aware datetime regardless of how the pipeline emits it
     if ts.tzinfo is None:
         ts = ts.replace(tzinfo=timezone.utc)
 
@@ -46,23 +44,20 @@ def ingest_events(
 
     for event in payload.events:
         try:
-            # ── Idempotency check (event_id is PRIMARY KEY) ──────────────────
             if db.get(EventORM, event.event_id):
                 duplicates += 1
                 continue
 
-            db.add(_event_to_orm(event))
-            db.flush()   # write to transaction buffer; catch errors per-row
+            with db.begin_nested():
+                db.add(_event_to_orm(event))
             ingested += 1
 
-        except Exception as exc:
-            db.rollback()   # roll back only the failed row's flush
+        except Exception as exc:   
             errors.append({
                 "event_id": event.event_id,
                 "reason":   str(exc),
             })
 
-    # Commit everything that succeeded
     db.commit()
 
     # Expose event count for the logging middleware

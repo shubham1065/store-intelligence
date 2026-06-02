@@ -11,17 +11,14 @@ router = APIRouter()
 
 STALE_THRESHOLD_MINUTES = 10
 
-
 @router.get("/health", response_model=HealthResponse)
 def health_check(db: Session = Depends(get_db)):
-    # ── 1. Database liveness ──────────────────────────────────────────────────
     try:
         db.execute(text("SELECT 1"))
         db_status = "healthy"
     except Exception:
         db_status = "unhealthy"
 
-    # ── 2. Per-store feed freshness ───────────────────────────────────────────
     now      = datetime.now(tz=timezone.utc)
     cutoff   = now - timedelta(minutes=STALE_THRESHOLD_MINUTES)
 
@@ -35,7 +32,6 @@ def health_check(db: Session = Depends(get_db)):
     stale_stores: list[str] = []
 
     for store_id, last_ts in store_rows:
-        # SQLite returns naive datetimes — normalise
         if last_ts and last_ts.tzinfo is None:
             last_ts = last_ts.replace(tzinfo=timezone.utc)
 

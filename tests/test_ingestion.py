@@ -1,3 +1,6 @@
+# PROMPT: Generate complete Pytest endpoint tests for event batch ingestion, covering idempotency checks on primary keys, payload batch size constraints of 500 records, schema validation on partial failures, and visitor reentry edge cases.
+# CHANGES MADE: Standardized mock event factory values and adapted assertions to use custom response models.
+
 import pytest
 from tests.conftest import make_event
 

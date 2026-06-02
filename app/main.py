@@ -18,7 +18,6 @@ from app.heatmap   import router as heatmap_router
 from app.anomalies import router as anomalies_router
 from app.pos import router as pos_router
 
-# ─── Logging Setup ────────────────────────────────────────────────────────────
 logging.basicConfig(
     format="%(message)s",
     level=logging.INFO,
@@ -38,15 +37,12 @@ structlog.configure(
 logger = structlog.get_logger()
 
 
-# ─── App ──────────────────────────────────────────────────────────────────────
 app = FastAPI(
     title="Store Intelligence API",
     description="Real-time retail analytics from CCTV event streams",
     version="1.0.0",
 )
 
-
-# ─── Routers ──────────────────────────────────────────────────────────────────
 app.include_router(ingest_router)
 app.include_router(health_router)
 app.include_router(metrics_router)
@@ -55,7 +51,6 @@ app.include_router(heatmap_router)
 app.include_router(anomalies_router)
 app.include_router(pos_router)  
 
-# ─── Middleware ───────────────────────────────────────────────────────────────
 @app.get("/", tags=["Root"])
 async def root():
     return {
@@ -82,7 +77,6 @@ async def request_logging_middleware(request: Request, call_next):
 
     latency_ms = int((time.perf_counter() - start) * 1000)
 
-    # Read event_count from response header if ingest set it
     event_count = response.headers.get("X-Event-Count", "N/A")
 
     logger.info("request",
@@ -98,12 +92,8 @@ async def request_logging_middleware(request: Request, call_next):
     response.headers["X-Trace-ID"] = trace_id
     return response
 
-
-# ─── Exception Handlers ───────────────────────────────────────────────────────
-
 @app.exception_handler(OperationalError)
 async def db_error_handler(request: Request, exc: OperationalError):
-    
     logger.error("database_unavailable", error=str(exc))
     return JSONResponse(
         status_code=503,
@@ -122,22 +112,17 @@ async def generic_error_handler(request: Request, exc: Exception):
         content={"error": "internal_error", "message": "An unexpected error occurred."},
     )
 
-
-# ─── Startup ──────────────────────────────────────────────────────────────────
 @app.on_event("startup")
 def on_startup():
-    # Create tables if they don't exist yet
     create_tables()
     logger.info("database_tables_ready")
 
-    # Auto-load POS transactions CSV if present in /data
     pos_csv = Path("/data/pos_transactions.csv")
     if pos_csv.exists():
         _load_pos_csv(pos_csv)
     else:
         logger.info("pos_csv_not_found", path=str(pos_csv),
                     note="Place pos_transactions.csv in /data/ to load it")
-
 
 def _load_pos_csv(path: Path):
     db = SessionLocal()
@@ -159,6 +144,7 @@ def _load_pos_csv(path: Path):
                     basket_value_inr=float(row["basket_value_inr"]),
                 )
                 db.add(txn)
+                loaded += 1
             db.commit()
         logger.info("pos_transactions_loaded", loaded=loaded, skipped=skipped)
     except Exception as e:

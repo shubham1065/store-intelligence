@@ -3,9 +3,6 @@ from typing import Optional, List, Dict, Any
 from pydantic import BaseModel, Field, field_validator
 from datetime import datetime
 
-
-# ─── Enums ────────────────────────────────────────────────────────────────────
-
 class EventType(str, Enum):
     ENTRY                 = "ENTRY"
     EXIT                  = "EXIT"
@@ -20,9 +17,6 @@ class AnomalySeverity(str, Enum):
     INFO     = "INFO"
     WARN     = "WARN"
     CRITICAL = "CRITICAL"
-
-
-# ─── Ingest ───────────────────────────────────────────────────────────────────
 
 class EventMetadata(BaseModel):
     queue_depth: Optional[int]  = None
@@ -58,9 +52,6 @@ class IngestResponse(BaseModel):
     duplicates:     int
     errors:         List[Dict[str, Any]]
 
-
-# ─── Metrics ──────────────────────────────────────────────────────────────────
-
 class ZoneDwell(BaseModel):
     zone_id:      str
     avg_dwell_ms: float
@@ -75,9 +66,6 @@ class MetricsResponse(BaseModel):
     queue_depth:       int
     abandonment_rate:  float
 
-
-# ─── Funnel ───────────────────────────────────────────────────────────────────
-
 class FunnelStage(BaseModel):
     stage:        str
     count:        int
@@ -88,22 +76,16 @@ class FunnelResponse(BaseModel):
     date:     str
     stages:   List[FunnelStage]
 
-
-# ─── Heatmap ──────────────────────────────────────────────────────────────────
-
 class HeatmapZone(BaseModel):
     zone_id:          str
     visit_count:      int
     avg_dwell_ms:     float
-    normalized_score: float          # 0–100
-    data_confidence:  bool           # False if < 20 sessions
+    normalized_score: float          
+    data_confidence:  bool
 
 class HeatmapResponse(BaseModel):
     store_id: str
     zones:    List[HeatmapZone]
-
-
-# ─── Anomalies ────────────────────────────────────────────────────────────────
 
 class Anomaly(BaseModel):
     anomaly_type:     str
@@ -118,16 +100,13 @@ class AnomalyResponse(BaseModel):
     store_id:  str
     anomalies: List[Anomaly]
 
-
-# ─── Health ───────────────────────────────────────────────────────────────────
-
 class StoreFeedStatus(BaseModel):
     last_event_timestamp: Optional[str]
-    status:               str     # "OK" | "STALE_FEED" | "NO_DATA"
+    status:               str
 
 class HealthResponse(BaseModel):
-    status:       str             # "healthy" | "degraded"
-    database:     str             # "healthy" | "unhealthy"
+    status:       str
+    database:     str
     store_feeds:  Dict[str, StoreFeedStatus]
     stale_stores: List[str]
     checked_at:   str

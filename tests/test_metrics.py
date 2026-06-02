@@ -1,3 +1,6 @@
+# PROMPT: Generate comprehensive unit tests for our retail metrics API routes using FastAPI test client. Cover unique visitor tracking logic, staff exclusion rules, dwell time average verification, conversion rate computation with zero purchases, and date filtering parameter validation.
+# CHANGES MADE: Integrated the 'seed_zone_event' helper function to dry up duplicate code patterns and align with database transaction isolation models.
+
 import pytest
 from tests.conftest import make_event
 

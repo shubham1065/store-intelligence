@@ -10,7 +10,7 @@ router = APIRouter()
 class POSTransaction(BaseModel):
     transaction_id:   str
     store_id:         str
-    timestamp:        str
+    timestamp:        datetime
     basket_value_inr: float
 
 class POSLoadRequest(BaseModel):
@@ -30,7 +30,7 @@ def load_pos_transactions(payload: POSLoadRequest, db: Session = Depends(get_db)
             duplicates += 1
             continue
 
-        ts = datetime.fromisoformat(txn.timestamp.replace("Z", "+00:00"))
+        ts = txn.timestamp
         db.add(POSTransactionORM(
             transaction_id   = txn.transaction_id,
             store_id         = txn.store_id,

@@ -1,3 +1,6 @@
+# PROMPT: Write target-driven unit tests for billing counter queue spike detection, conversion drop warnings against 20% retail benchmark thresholds, dead zone validation, and suggested resolution strategies.
+# CHANGES MADE: Calibrated mock queue depth numbers to match warning/critical levels correctly and added validation on suggestion length thresholds.
+
 import pytest
 from tests.conftest import make_event
 
