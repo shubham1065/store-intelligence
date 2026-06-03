@@ -1,0 +1,43 @@
+{
+  "store_id": "ST1076",
+  "store_name": "Mumbai",
+  "date": "2026-03-08",
+  "open_hours": { "open": "11:00", "close": "22:00" },
+
+  "cameras": [
+    {
+      "camera_id": "CAM_01",
+      "type": "entry",
+      "clip_filename": "cam1.mp4",
+      "clip_start_time": "13:39:50",
+      "entry_line_y_ratio": 0.55,
+      "entry_direction": "top_to_bottom",
+      "primary_zones": []
+    },
+    {
+      "camera_id": "CAM_02",
+      "type": "floor",
+      "clip_filename": "cam2.mp4",
+      "clip_start_time": "15:27:50",
+      "primary_zones": ["MAKEUP", "SKIN"]
+    },
+    {
+      "camera_id": "CAM_05",
+      "type": "billing",
+      "clip_filename": "cam5.mp4",
+      "clip_start_time": "18:27:50",
+      "primary_zones": ["BILLING"]
+    }
+  ],
+
+  "zones": [
+    { "zone_id": "MAKEUP",  "sku_zone": "makeup", "camera_id": "CAM_02" },
+    { "zone_id": "SKIN",    "sku_zone": "skin",   "camera_id": "CAM_02" },
+    { "zone_id": "BILLING", "sku_zone": "billing","camera_id": "CAM_05" }
+  ],
+
+  "staff": {
+    "uniform_hsv": { "lower": [0,0,0], "upper": [180,255,60] },
+    "long_presence_minutes": 8
+  }
+}
