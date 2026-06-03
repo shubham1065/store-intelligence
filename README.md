@@ -1,6 +1,4 @@
-<img width="1353" height="636" alt="dash1" src="https://github.com/user-attachments/assets/7a4aa275-2aca-4f5e-97a8-227839c99b41" />
 # Store Intelligence API
-
 
 <p align="left">
   <img src="docs/banner.svg" alt="Purplle Intelligence System" width="800" />
