@@ -1,3 +1,4 @@
+<img width="1353" height="636" alt="dash1" src="https://github.com/user-attachments/assets/7a4aa275-2aca-4f5e-97a8-227839c99b41" />
 # Store Intelligence API
 
 
@@ -94,6 +95,8 @@ python pipeline/pos_loader.py data/Brigade_Bangalore_10_April_26.csv
 ---
 
 ## Live Dashboard
+<img width="1350" height="630" alt="dash2" src="https://github.com/user-attachments/assets/b58fbe84-ccad-4df7-ad17-3d66e9308d34" />
+<img width="1353" height="636" alt="dash1" src="https://github.com/user-attachments/assets/47db103d-b8ec-4906-b083-aa77a2962b97" />
 
 We provide both a terminal-based UI and a premium browser-based dashboard.
 
