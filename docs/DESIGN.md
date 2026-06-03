@@ -106,6 +106,8 @@ Primary source is ENTRY events from the entry camera. When the entry camera over
 **POS data:**
 The actual CSV (`Brigade_Bangalore_10_April_26.csv`) contains item-level rows with 37 columns. The pipeline groups by `invoice_number` to produce basket totals before loading into the API's `pos_transactions` table.
 
+* **Store 2 Data Limitations:** Store 2 (ST1076 — Mumbai) only has video feeds and tracking event data (`events_store2.jsonl`). Because no Point-of-Sale transaction data is loaded for this store, metrics such as conversion rate and purchase funnel stages will calculate as zero.
+
 ---
 
 ## Stage 4 — Storage

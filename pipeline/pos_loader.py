@@ -10,12 +10,15 @@ def load_pos_to_api(csv_path: str, api_base_url: str, store_id: str = "ST1008"):
     """
 
     df = pd.read_csv(csv_path)
-    # Group by invoice to get one row per transaction
     invoices = (
         df.groupby(["invoice_number", "order_date", "order_time"])
         .agg(basket_value_inr=("total_amount", "sum"))
         .reset_index()
     )
+
+    csv_store_id = store_id
+    if "store_id" in df.columns and len(df) > 0:
+        csv_store_id = str(df.iloc[0]["store_id"])
 
     transactions = []
     for _, row in invoices.iterrows():
@@ -26,7 +29,7 @@ def load_pos_to_api(csv_path: str, api_base_url: str, store_id: str = "ST1008"):
 
         transactions.append({
             "transaction_id":  row["invoice_number"],
-            "store_id":        store_id,
+            "store_id":        csv_store_id,
             "timestamp":       ts.strftime("%Y-%m-%dT%H:%M:%SZ"),
             "basket_value_inr": round(float(row["basket_value_inr"]), 2),
         })

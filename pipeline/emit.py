@@ -82,6 +82,8 @@ class EventWriter:
                 data = resp.json()
                 print(f"  → API: ingested={data['ingested']} "
                       f"dupes={data['duplicates']} errors={len(data['errors'])}")
+                for err in data.get("errors", []):
+                    print(f"    ✗ Event {err.get('event_id')} failed: {err.get('reason')}")
             else:
                 print(f"  → API error {resp.status_code}")
         except Exception as e:

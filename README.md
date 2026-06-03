@@ -70,8 +70,21 @@ python pipeline/detect.py \
   --layout pipeline/config/store_layout.json \
   --api    http://localhost:8000
 ```
+## Running Store 2 (ST1076 — Mumbai)
+
+```bash
+python pipeline/detect.py \
+  --clips  data/clips2 \
+  --output data/events_store2.jsonl \
+  --layout pipeline/config/store2_layout.json \
+  --api    http://localhost:8000
+```
 
 Note: The script automatically downloads yolov8m.pt (~50MB) directly to the root folder on its first initialization.
+
+> [!NOTE]
+> **Data Limit Note for Store 2 (ST1076):** Conversion rate and purchase-related metrics will be 0.0 because there is no corresponding POS transactions CSV (`pos.csv`) provided for Store 2. Only the computer-vision tracking metrics (dwell times, visits, and queues) are active.
+
 
 ### Load POS transactions
 ```bash
@@ -207,10 +220,15 @@ store-intelligence/
 │   │   └── *.mp4            # Store camera feeds (5 target camera streams)
 │   ├── Brigade_Bangalore_10_April_26.csv   # Local Point-of-Sale ingestion data
 │   ├── events.jsonl         # Buffered downstream event logs
-│   └── store.db             # Target engine SQLite file (metrics & tracking state)
+│   |── store.db             # Target engine SQLite file (metrics & tracking state)
+│   ├──clips2/
+│   │  └── *.mp4            # 2nd store videos
+│   └──events_store2.jsonl  # Events from Store 2
 ├── docs/                    # Project documentation
+│   ├── banner.svg           # Project banner
 │   ├── CHOICES.md           # Architecture and design trade-offs
-│   └── DESIGN.md            # System design details
+│   |── DESIGN.md            # System design details
+|   └── nce.git
 ├── pipeline/                # Computer Vision & Detection pipeline
 │   ├── config/
 │   │   └── store_layout.json  # Spatial configuration for zone tracking

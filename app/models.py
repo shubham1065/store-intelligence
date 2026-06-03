@@ -2,6 +2,7 @@ from enum import Enum
 from typing import Optional, List, Dict, Any
 from pydantic import BaseModel, Field, field_validator
 from datetime import datetime
+from pydantic import field_validator
 
 class EventType(str, Enum):
     ENTRY                 = "ENTRY"
@@ -35,6 +36,13 @@ class StoreEvent(BaseModel):
     is_staff:   bool           = False
     confidence: float          = Field(..., ge=0.0, le=1.0)
     metadata:   EventMetadata  = Field(default_factory=EventMetadata)
+
+    @field_validator("event_type", mode="before")
+    @classmethod
+    def normalize_event_type(cls, v):
+        if isinstance(v, str):
+            return v.upper()
+        return v
 
 class EventBatch(BaseModel):
     events: List[StoreEvent]

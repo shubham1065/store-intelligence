@@ -6,6 +6,7 @@ __pycache__/
 htmlcov/
 .coverage
 data/clips/
+data/clips2/
 data/*.csv
 data/*.xlsx
 data/*.mp4
@@ -13,6 +14,7 @@ data/*.jsonl
 data/*.db
 !data/.gitkeep
 !data/clips/.gitkeep
+!data/clips2/.gitkeep
 yolov8m.pt
 *.pt
 runs/

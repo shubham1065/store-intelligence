@@ -53,6 +53,8 @@ def ingest_events(
             ingested += 1
 
         except Exception as exc:   
+            import traceback
+            traceback.print_exc()
             errors.append({
                 "event_id": event.event_id,
                 "reason":   str(exc),
@@ -60,7 +62,6 @@ def ingest_events(
 
     db.commit()
 
-    # Expose event count for the logging middleware
     response.headers["X-Event-Count"] = str(ingested)
 
     return IngestResponse(
