@@ -1,5 +1,5 @@
 $CLIPS_DIR  = "data\clips"
-$OUTPUT     = "data\events.jsonl"
+$OUTPUT     = "data\sample_events.jsonl"
 $LAYOUT     = "pipeline\config\store_layout.json"
 $API_URL    = "http://localhost:8000"
 
@@ -9,7 +9,7 @@ New-Item -ItemType Directory -Force -Path "data" | Out-Null
 
 if (Test-Path $OUTPUT) {
     Remove-Item $OUTPUT
-    Write-Host "Cleared previous events.jsonl"
+    Write-Host "Cleared previous sample_events.jsonl"
 }
 
 # Running detection

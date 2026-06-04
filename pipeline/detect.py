@@ -305,7 +305,7 @@ def main():
     parser = argparse.ArgumentParser(description="Store Intelligence Detection Pipeline")
     parser.add_argument("--clips",  default="data/clips",
                         help="Folder containing video clips")
-    parser.add_argument("--output", default="data/events.jsonl",
+    parser.add_argument("--output", default="data/sample_events.jsonl",
                         help="Output JSONL file path")
     parser.add_argument("--layout", default="pipeline/config/store_layout.json",
                         help="Store layout JSON config")

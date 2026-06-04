@@ -65,7 +65,7 @@ Or manually initialize the pipeline script:
 ```bash
 python pipeline/detect.py \
   --clips  data/clips \
-  --output data/events.jsonl \
+  --output data/sample_events.jsonl \
   --layout pipeline/config/store_layout.json \
   --api    http://localhost:8000
 ```
@@ -74,7 +74,7 @@ python pipeline/detect.py \
 ```bash
 python pipeline/detect.py \
   --clips  data/clips2 \
-  --output data/events_store2.jsonl \
+  --output data/sample_events_store2.jsonl \
   --layout pipeline/config/store2_layout.json \
   --api    http://localhost:8000
 ```
@@ -119,7 +119,7 @@ python dashboard/live.py
 To replay previously processed events in simulated real-time and watch the live updates:
 ```bash
 # Terminal 1 — Replay events to the API
-python dashboard/replay.py --input data/events.jsonl --speed 20
+python dashboard/replay.py --input data/sample_events.jsonl --speed 20
 
 # Terminal 2 — Run the terminal dashboard (or keep the Web dashboard open!)
 python dashboard/live.py
@@ -160,7 +160,7 @@ graph LR
     POS[POS Transaction CSV] --> Ingest[POS Loader Module]
 
     %% Pipeline Processing
-    Vision -->|Structured Events| JSONL[(events.jsonl)]
+    Vision -->|Structured Events| JSONL[(sample_events.jsonl)]
     JSONL --> API[FastAPI Backend Engine]
     Ingest --> API
 
@@ -180,8 +180,8 @@ The vision architecture executes through five core logical stages:
 4. Event Emission — State machine tracking engine emitting structural ENTRY, EXIT, ZONE, DWELL, BILLING, and REENTRY events.
 5. Re-ID — Color histogram cosine similarity validation paired with a rolling 30-minute re-entry window block.
 
-* 📖 **Engineering Rationale:** Detailed design trade-offs, performance benchmarks, and AI override justifications are documented in [`docs/CHOICES.md`](docs/CHOICES.md).
-* 🏗️ **Architectural Deep-Dive:** Comprehensive system engineering layouts, database schemas, and camera topography logic are detailed in [`docs/DESIGN.md`](docs/DESIGN.md).
+* 📖 **Engineering Rationale:** Detailed design trade-offs, performance benchmarks, and AI override justifications are documented in [`CHOICES.md`](CHOICES.md).
+* 🏗️ **Architectural Deep-Dive:** Comprehensive system engineering layouts, database schemas, and camera topography logic are detailed in [`DESIGN.md`](DESIGN.md).
 
 ---
 
@@ -220,19 +220,20 @@ store-intelligence/
 │   ├── clips/               # Raw video footage for the vision pipeline
 │   │   └── *.mp4            # Store camera feeds (5 target camera streams)
 │   ├── Brigade_Bangalore_10_April_26.csv   # Local Point-of-Sale ingestion data
-│   ├── events.jsonl         # Buffered downstream event logs
+│   ├── sample_events.jsonl         # Buffered downstream event logs
 │   |── store.db             # Target engine SQLite file (metrics & tracking state)
 │   ├──clips2/
 │   │  └── *.mp4            # 2nd store videos
-│   └──events_store2.jsonl  # Events from Store 2
+│   └──sample_events_store2.jsonl  # Events from Store 2
 ├── docs/                    # Project documentation
-│   ├── banner.svg           # Project banner
-│   ├── CHOICES.md           # Architecture and design trade-offs
-│   |── DESIGN.md            # System design details
+│   └── banner.svg           # Project banner
+├── CHOICES.md               # Architecture and design trade-offs
+├── DESIGN.md                # System design details
 |   └── nce.git
 ├── pipeline/                # Computer Vision & Detection pipeline
 │   ├── config/
 │   │   └── store_layout.json  # Spatial configuration for zone tracking
+|   ├──convert_to_submission_schema.py  # converting necessary files to required schema for evaluation
 │   ├── detect.py            # Main frame processing and YOLO inference
 │   ├── emit.py            # Event schema builder
 │   ├── pos_loader.py        # POS CSV data ingestion
@@ -258,4 +259,4 @@ The data/ directory tracks local state and source assets. Because it contains he
 1. Ensure the data/ and data/clips/ directories exist at the root.
 2. Drop your source video streams (.mp4 format) into data/clips/.
 3. Provide the necessary Brigade_Bangalore_10_April_26.csv to feed the POS ingestion pipeline (I renamed the original .csv file to this to match what I used in pipeline).
-4. The underlying runtime state machine automatically handles generation schemas for store.db and downstream events.jsonl buffers upon bootstrap execution.
+4. The underlying runtime state machine automatically handles generation schemas for store.db and downstream sample_events.jsonl buffers upon bootstrap execution.

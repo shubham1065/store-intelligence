@@ -11,6 +11,8 @@ data/*.csv
 data/*.xlsx
 data/*.mp4
 data/*.jsonl
+!data/sample_events.jsonl
+!data/sample_events_store2.jsonl
 data/*.db
 !data/.gitkeep
 !data/clips/.gitkeep

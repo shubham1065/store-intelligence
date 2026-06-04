@@ -135,6 +135,22 @@ def on_startup():
     create_tables()
     logger.info("database_tables_ready")
 
+    # Copy sample_events files to submission directory
+    try:
+        import shutil
+        src_dir = Path(__file__).parent.parent / "data"
+        dest_dir = Path(__file__).parent.parent / "submission"
+        dest_dir.mkdir(parents=True, exist_ok=True)
+        
+        for name in ["sample_events.jsonl", "sample_events_store2.jsonl"]:
+            src_file = src_dir / name
+            dest_file = dest_dir / name
+            if src_file.exists():
+                shutil.copy2(src_file, dest_file)
+                logger.info("deliverable_copied", src=str(src_file), dest=str(dest_file))
+    except Exception as e:
+        logger.error("deliverable_copy_failed", error=str(e))
+
     pos_csv = Path("/data/pos_transactions.csv")
     if pos_csv.exists():
         _load_pos_csv(pos_csv)

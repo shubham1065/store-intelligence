@@ -51,7 +51,7 @@ def replay(input_path: str, api_url: str, speed: float):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input",  default="data/events.jsonl")
+    parser.add_argument("--input",  default="data/sample_events.jsonl")
     parser.add_argument("--api",    default="http://localhost:8000")
     parser.add_argument("--speed",  type=float, default=20.0,
                         help="Replay speed multiplier (20 = 20x faster than real-time)")
