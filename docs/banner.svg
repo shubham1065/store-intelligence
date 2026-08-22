@@ -20,11 +20,6 @@
           font-size="14px" 
           fill="#7a22b4" 
           text-anchor="end">- by Shubham Agarwal</text>
-    <text x="0" y="20" 
-          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" 
-          font-weight="500" 
-          font-size="14px" 
-          fill="#7a22b4" 
-          text-anchor="end">Intern Applicant</text>
+   
   </g>
 </svg>
