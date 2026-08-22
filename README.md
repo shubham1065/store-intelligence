@@ -4,8 +4,6 @@
   <img src="docs/banner.svg" alt="Purplle Intelligence System" width="800" />
 </p>
 
-**Purplle Tech Challenge 2026 — Offline Store Analytics Pipeline**
-
 Converts raw CCTV footage into real-time retail business metrics.
 Processes 5 camera feeds → structured events → REST API → live dashboard.
 
